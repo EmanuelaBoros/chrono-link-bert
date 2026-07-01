@@ -3,3 +3,12 @@ huggingface_hub
 requests
 spacy
 tqdm
+torch
+transformers
+datasets
+accelerate
+huggingface_hub
+seqeval
+pandas
+numpy
+tqdm
