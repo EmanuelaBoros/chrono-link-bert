@@ -416,13 +416,14 @@ def enrich_article(
 
 
 def load_americanstories_year(year: int):
-    return load_dataset(
+    dataset = load_dataset(
         "dell-research-harvard/AmericanStories",
-        str(year),
-        split="train",
-        streaming=True,
+        "subset_years",
+        year_list=[str(year)],
         trust_remote_code=True,
     )
+
+    return dataset[str(year)]
 
 
 def main() -> None:
