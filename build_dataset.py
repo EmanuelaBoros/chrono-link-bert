@@ -416,15 +416,12 @@ def enrich_article(
 
 
 def load_americanstories_year(year: int):
-    """
-    AmericanStories is commonly loaded by year as a config.
-    If this fails, try changing the config string manually after inspecting the dataset card.
-    """
     return load_dataset(
         "dell-research-harvard/AmericanStories",
         str(year),
         split="train",
         streaming=True,
+        trust_remote_code=True,
     )
 
 
