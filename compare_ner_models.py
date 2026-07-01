@@ -36,6 +36,37 @@ DEFAULT_MODELS = [
 ]
 
 
+def make_json_serializable(obj):
+    """
+    Convert NumPy / torch scalar types to native Python types
+    so json.dumps and pandas do not crash.
+    """
+    if isinstance(obj, dict):
+        return {str(k): make_json_serializable(v) for k, v in obj.items()}
+
+    if isinstance(obj, list):
+        return [make_json_serializable(v) for v in obj]
+
+    if isinstance(obj, tuple):
+        return tuple(make_json_serializable(v) for v in obj)
+
+    if isinstance(obj, np.integer):
+        return int(obj)
+
+    if isinstance(obj, np.floating):
+        return float(obj)
+
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+
+    if isinstance(obj, torch.Tensor):
+        if obj.numel() == 1:
+            return obj.item()
+        return obj.detach().cpu().tolist()
+
+    return obj
+
+
 def safe_model_name(model_name: str) -> str:
     return (
         model_name.replace("/", "__")
@@ -349,20 +380,24 @@ def train_one_model(
         "model": model_name,
         "output_dir": str(output_dir),
         "hub_model_id": hub_model_id,
-        "valid_precision": valid_metrics.get("eval_precision"),
-        "valid_recall": valid_metrics.get("eval_recall"),
-        "valid_f1": valid_metrics.get("eval_f1"),
-        "test_precision": test_report["test_precision"],
-        "test_recall": test_report["test_recall"],
-        "test_f1": test_report["test_f1"],
+        "valid_precision": float(valid_metrics.get("eval_precision")),
+        "valid_recall": float(valid_metrics.get("eval_recall")),
+        "valid_f1": float(valid_metrics.get("eval_f1")),
+        "test_precision": float(test_report["test_precision"]),
+        "test_recall": float(test_report["test_recall"]),
+        "test_f1": float(test_report["test_f1"]),
     }
 
     report_path = output_dir / "classification_report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(
-        json.dumps(test_report["classification_report"], indent=2),
+        json.dumps(
+            make_json_serializable(test_report["classification_report"]),
+            indent=2,
+        ),
         encoding="utf-8",
     )
+    print(f"Classification report: {result}")
 
     if args.push_each_model_to_hub:
         trainer.push_to_hub()
@@ -475,12 +510,19 @@ def main() -> None:
 
             import pandas as pd
 
-            pd.DataFrame(results).sort_values(
-                by="test_f1",
-                ascending=False,
-            ).to_csv(args.summary_csv, index=False)
+            current_df = pd.DataFrame(results)
+
+            if "test_f1" in current_df.columns:
+                current_df = current_df.sort_values(
+                    by="test_f1",
+                    ascending=False,
+                    na_position="last",
+                )
+
+            current_df.to_csv(args.summary_csv, index=False)
 
             print("\nCurrent results:")
+            print(current_df)
             print(pd.DataFrame(results).sort_values(by="test_f1", ascending=False))
 
         except Exception as e:
@@ -494,11 +536,16 @@ def main() -> None:
 
     import pandas as pd
 
-    df = pd.DataFrame(results).sort_values(
-        by="test_f1",
-        ascending=False,
-        na_position="last",
-    )
+    df = pd.DataFrame(results)
+
+    if "test_f1" in df.columns:
+        df = df.sort_values(
+            by="test_f1",
+            ascending=False,
+            na_position="last",
+        )
+    else:
+        print("Warning: no successful model produced test_f1.")
     df.to_csv(args.summary_csv, index=False)
 
     print("\nFinal NER comparison")
