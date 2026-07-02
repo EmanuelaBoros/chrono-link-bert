@@ -205,11 +205,11 @@ The following results compare Chrono-Link-BERT against generic BERT and several 
 
 | Rank | Model | Valid Precision | Valid Recall | Valid F1 | Test Precision | Test Recall | Test F1 |
 |---:|---|---:|---:|---:|---:|---:|---:|
-| 1 | `Livingwithmachines/bert_1760_1900` | 0.7915 | 0.8723 | 0.8300 | 0.7854 | **0.8635** | **0.8226** |
-| 2 | `Livingwithmachines/bert_1850_1875` | 0.7871 | **0.8809** | **0.8313** | **0.7971** | 0.8307 | 0.8135 |
+| 1 | `Livingwithmachines/bert_1760_1900` | 0.7915 | 0.8723 | 0.8300 | 0.7854 | <u>0.8635</u> | <u>0.8226</u> |
+| 2 | `Livingwithmachines/bert_1850_1875` | 0.7871 | <u>0.8809</u> | <u>0.8313</u> | <u>0.7971</u> | 0.8307 | 0.8135 |
 | 3 | `Livingwithmachines/bert_1760_1850` | 0.7876 | 0.8681 | 0.8259 | 0.7948 | 0.8222 | 0.8083 |
-| 4 | `Livingwithmachines/bert_1890_1900` | **0.7969** | 0.8681 | 0.8310 | 0.7858 | 0.8315 | 0.8080 |
-| 5 | `Livingwithmachines/bert_1875_1890` | 0.7841 | **0.8809** | 0.8297 | 0.7754 | 0.8172 | 0.7957 |
+| 4 | `Livingwithmachines/bert_1890_1900` | <u>0.7969</u> | 0.8681 | 0.8310 | 0.7858 | 0.8315 | 0.8080 |
+| 5 | `Livingwithmachines/bert_1875_1890` | 0.7841 | <u>0.8809</u> | 0.8297 | 0.7754 | 0.8172 | 0.7957 |
 | 6 | `bert-base-cased` | 0.7773 | 0.8170 | 0.7967 | 0.7819 | 0.7793 | 0.7806 |
 | 7 | `emanuelaboros/chrono-link-bert-americanstories-1850-1890` | 0.7520 | 0.8128 | 0.7812 | 0.7490 | 0.7970 | 0.7722 |
 
